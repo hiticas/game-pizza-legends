@@ -1,5 +1,7 @@
 import Shadow from "../assets/images/characters/shadow.png";
+import { utils } from "../helpers/utils";
 import { GameObjectConfig } from "./GameObject";
+import { PersonConfig } from "./Person";
 
 interface SpriteConfig {
   gameObject: GameObjectConfig;
@@ -113,9 +115,10 @@ export default class Sprite {
     }
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
-    const x = this.gameObject.x - 8;
-    const y = this.gameObject.y - 18;
+  draw(ctx: CanvasRenderingContext2D, cameraPerson: PersonConfig) {
+    const x = this.gameObject.x - 8 + utils.withGrid(10.5) - cameraPerson.x;
+    const y = this.gameObject.y - 18 + utils.withGrid(6) - cameraPerson.y;
+
     this.isShadowLoaded &&
       ctx?.drawImage(
         this.shadow,

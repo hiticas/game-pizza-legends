@@ -5,6 +5,7 @@
 
 import DirectionInput from "./DirectionInput";
 import OverworldMap from "./OverworldMap";
+import { PersonConfig } from "./Person";
 
 interface ConfigElement {
   element: HTMLElement | null;
@@ -34,19 +35,25 @@ export default class Overworld {
         this.canvas?.height ?? 0
       );
 
-      if (this.ctx) {
-        this.map?.drawLowerImage(this.ctx);
-      }
+      const cameraPerson: PersonConfig = this.map?.gameObjects?.hero;
 
       Object.values(this.map?.gameObjects || {}).forEach((object: any) => {
         object.update({
           arrow: this.directionInput?.direction,
+          map: this.map,
         });
-        object.sprite.draw(this.ctx);
       });
 
       if (this.ctx) {
-        this.map?.drawUpperImage(this.ctx);
+        this.map?.drawLowerImage(this.ctx, cameraPerson);
+      }
+
+      Object.values(this.map?.gameObjects || {}).forEach((object: any) => {
+        object.sprite.draw(this.ctx, cameraPerson);
+      });
+
+      if (this.ctx) {
+        this.map?.drawUpperImage(this.ctx, cameraPerson);
       }
 
       requestAnimationFrame(() => {

@@ -24,39 +24,41 @@ export default class Person extends GameObject {
     };
   }
 
-  update(state: Record<string, string>) {
-    this.updatePosition();
-    this.updateSprite(state);
-    if (
-      this.isPlayerControlled &&
-      this.movingProgressRemaining === 0 &&
-      state.arrow
-    ) {
-      this.direction = state.arrow;
+  update(state: any) {
+    if (this.movingProgressRemaining > 0) {
+      this.updatePosition();
+    } else {
+      if (this.isPlayerControlled && state.arrow) {
+        this.startBehavior(state, {
+          type: "walk",
+          direction: state.arrow,
+        });
+      }
+      this.updateSprite();
+    }
+  }
+
+  startBehavior(state: any, behavior: any) {
+    this.direction = behavior.direction;
+    if (behavior.type === "walk") {
+      if (state.map.isSpaceTaken(this.x, this.y, this.direction)) {
+        return;
+      }
       this.movingProgressRemaining = 16;
     }
   }
 
   updatePosition() {
-    if (this.movingProgressRemaining > 0) {
-      const [property, change] = this.directionUpdate[this.direction];
-      this[property as keyof this] += change;
-      this.movingProgressRemaining -= 1;
-    }
+    const [property, change] = this.directionUpdate[this.direction];
+    this[property as keyof this] += change;
+    this.movingProgressRemaining -= 1;
   }
 
-  updateSprite(state: Record<string, string>) {
-    if (
-      this.isPlayerControlled &&
-      this.movingProgressRemaining === 0 &&
-      !state.arrow
-    ) {
-      this.sprite.setAnimation("idle-" + this.direction);
-      return;
-    }
-
+  updateSprite() {
     if (this.movingProgressRemaining > 0) {
       this.sprite.setAnimation("walk-" + this.direction);
+      return;
     }
+    this.sprite.setAnimation("idle-" + this.direction);
   }
 }
